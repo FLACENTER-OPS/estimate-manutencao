@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Estimate Manutenção — Florida Auto Center</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;background:#f7f5f0;color:#1a1814;font-family:'DM Mono',monospace;font-size:16px;-webkit-text-size-adjust:100%;overflow-x:hidden}
+.hdr{background:#1a1814;padding:20px;position:sticky;top:0;z-index:100}
+.hdr-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#c8a96e;margin-bottom:4px}
+.hdr-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#f0ece4}
+.content{padding:16px;width:100%;max-width:600px;margin:0 auto;padding-bottom:48px}
+.section{background:#fff;border:1px solid #ddd9d2;border-radius:12px;padding:18px 16px;margin-bottom:14px}
+.stitle{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b8924a;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+label{display:block;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8a847a;margin-bottom:6px}
+label .req{color:#b8924a;margin-left:2px}
+input[type=text],input[type=number],input[type=url],select,textarea{width:100%;padding:14px 16px;border:1px solid #ddd9d2;border-radius:8px;background:#faf9f6;color:#1a1814;font-family:'DM Mono',monospace;font-size:16px;outline:none;-webkit-appearance:none;appearance:none;transition:border-color 0.2s}
+input:focus,select:focus,textarea:focus{border-color:#b8924a;background:#fff}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+textarea{resize:none;min-height:72px;line-height:1.5}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* ITEM CARD */
+.icard{background:#faf9f6;border:1px solid #ddd9d2;border-radius:10px;padding:16px;margin-bottom:10px;position:relative}
+.icard-title{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#b8924a;margin-bottom:12px}
+.rm-btn{position:absolute;top:14px;right:14px;background:#fdf0f0;border:1px solid rgba(154,44,44,0.2);color:#9a2c2c;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:'DM Mono',monospace}
+
+/* PECA TOGGLE */
+.peca-toggle-row{display:flex;align-items:center;gap:10px;margin-top:10px;cursor:pointer}
+.peca-toggle-row input[type=checkbox]{width:18px;height:18px;accent-color:#b8924a;cursor:pointer;flex-shrink:0}
+.peca-toggle-label{font-size:12px;color:#8a847a}
+.peca-fields{display:none;margin-top:12px;padding-top:12px;border-top:1px solid #e8e4de}
+.peca-fields.show{display:block}
+
+/* SEM VALOR TOGGLE */
+.sem-valor-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.sem-valor-row input[type=checkbox]{width:16px;height:16px;accent-color:#b8924a;cursor:pointer}
+.sem-valor-row label{font-size:11px;color:#8a847a;text-transform:none;letter-spacing:0;margin:0;cursor:pointer}
+
+.add-btn{width:100%;padding:14px;border:1px dashed #ddd9d2;border-radius:10px;background:transparent;color:#8a847a;font-family:'DM Mono',monospace;font-size:14px;cursor:pointer;margin-top:4px;transition:all 0.15s}
+.add-btn:active{border-color:#b8924a;color:#b8924a}
+
+/* TOTAL */
+.total-bar{background:#1a1814;border-radius:10px;padding:16px 20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.total-label{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#c8a96e}
+.total-value{font-family:'Fraunces',serif;font-size:22px;font-weight:300;color:#c8a96e}
+
+/* SUBMIT */
+.sub-btn{width:100%;padding:18px;background:#1a1814;color:#c8a96e;border:none;border-radius:10px;font-family:'DM Mono',monospace;font-size:15px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;cursor:pointer;margin-top:8px}
+.sub-btn:disabled{opacity:0.5;cursor:default}
+.spinner{display:none;text-align:center;padding:14px;color:#8a847a;font-size:13px}
+.err{background:#fdf0f0;border:1px solid rgba(154,44,44,0.2);color:#9a2c2c;border-radius:8px;padding:14px 16px;font-size:13px;margin-top:10px;display:none;line-height:1.5}
+
+/* SUCCESS */
+#success-view{display:none;text-align:center;padding:40px 20px}
+.sicon{font-size:56px;margin-bottom:16px}
+.stit{font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:#3a6b4a;margin-bottom:8px}
+.sid{font-size:13px;color:#8a847a;margin-bottom:24px;font-family:monospace;line-height:1.6}
+.snote{font-size:13px;color:#5a7a6a;line-height:1.7;background:#edf5f0;border:1px solid rgba(58,107,74,0.2);border-radius:10px;padding:16px;text-align:left}
+.new-btn{width:100%;padding:16px;background:#1a1814;color:#c8a96e;border:none;border-radius:10px;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-top:16px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-label">Florida Auto Center</div>
+  <div class="hdr-title">Estimate Manutenção</div>
+</div>
+
+<div class="content">
+<div id="form-view">
+
+  <!-- VEÍCULO -->
+  <div class="section">
+    <div class="stitle">Veículo</div>
+    <div class="field">
+      <label>VIN (últimos 6 ou completo) <span class="req">*</span></label>
+      <input type="text" id="vin" maxlength="17" placeholder="ex: KF174579"
+        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+        oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <div class="g2">
+      <div class="field" style="margin:0">
+        <label>Ano <span class="req">*</span></label>
+        <input type="number" id="ano" placeholder="2021" min="1990" max="2035">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Mileagem</label>
+        <input type="number" id="mileagem" placeholder="85000">
+      </div>
+    </div>
+    <div class="g2" style="margin-top:10px">
+      <div class="field" style="margin:0">
+        <label>Make <span class="req">*</span></label>
+        <input type="text" id="make" placeholder="Toyota" autocorrect="off">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Model <span class="req">*</span></label>
+        <input type="text" id="model" placeholder="Camry" autocorrect="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVIÇOS E PEÇAS -->
+  <div class="section">
+    <div class="stitle">Serviços & Peças</div>
+    <div id="items-wrap"></div>
+    <button class="add-btn" onclick="addItem()">+ Adicionar Item</button>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="total-bar">
+    <span class="total-label">Total Estimate</span>
+    <span class="total-value" id="total-display">$0.00</span>
+  </div>
+
+  <!-- OBSERVAÇÕES -->
+  <div class="section">
+    <div class="stitle">Observações (opcional)</div>
+    <textarea id="obs" placeholder="Informações adicionais sobre o veículo ou os serviços…"></textarea>
+  </div>
+
+  <button class="sub-btn" id="sub-btn" onclick="submitForm()">Enviar para Aprovação →</button>
+  <div class="spinner" id="spinner">Enviando estimate…</div>
+  <div class="err" id="err"></div>
+
+</div>
+
+<!-- SUCCESS -->
+<div id="success-view">
+  <div class="sicon">✅</div>
+  <div class="stit">Estimate Enviado!</div>
+  <div class="sid" id="success-id"></div>
+  <div class="snote">
+    O estimate foi enviado para aprovação do Antonio.<br><br>
+    Você receberá uma notificação assim que houver uma decisão.
+  </div>
+  <button class="new-btn" onclick="resetForm()">Novo Estimate →</button>
+</div>
+
+</div>
+
+<script>
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9Tv3uQO_QyN817Olz9utbOOzpac9nWWXjkcQXFP3MgldgK2jI-NGINMoK2N5sgj5F/exec";
+let ic = 0;
+
+function addItem() {
+  ic++;
+  const idx = ic;
+  const d = document.createElement('div');
+  d.className = 'icard';
+  d.id = 'ic' + idx;
+  d.innerHTML = `
+    <div class="icard-title">Item ${idx}</div>
+    ${idx > 1 ? `<button class="rm-btn" onclick="removeItem(${idx})">✕</button>` : ''}
+
+    <div class="field">
+      <label>Serviço / Descrição <span class="req">*</span></label>
+      <input type="text" id="desc-${idx}" placeholder="ex: Rear Brake Pads, Oil Change…"
+        autocorrect="off" oninput="calcTotal()">
+    </div>
+
+    <div class="g2">
+      <div class="field" style="margin:0">
+        <label>Mão de Obra $</label>
+        <input type="number" id="labor-${idx}" placeholder="0.00" step="0.01" min="0"
+          oninput="calcTotal()">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Prestador</label>
+        <input type="text" id="mech-${idx}" placeholder="Mecânico / Oficina" autocorrect="off">
+      </div>
+    </div>
+
+    <!-- Toggle Peça -->
+    <label class="peca-toggle-row" for="togPeca-${idx}">
+      <input type="checkbox" id="togPeca-${idx}" onchange="togglePeca(${idx}, this.checked)">
+      <span class="peca-toggle-label">📦 Precisa de peça?</span>
+    </label>
+
+    <!-- Campos da Peça -->
+    <div class="peca-fields" id="pf-${idx}">
+      <div class="field">
+        <label>Nome da Peça</label>
+        <input type="text" id="pnome-${idx}" placeholder="ex: Rear Brake Pads" autocorrect="off">
+      </div>
+      <div class="g2">
+        <div class="field" style="margin:0">
+          <label>Part Number</label>
+          <input type="text" id="pnum-${idx}" placeholder="ex: 18B560" autocorrect="off" autocapitalize="characters">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Fornecedor</label>
+          <input type="text" id="pforn-${idx}" placeholder="Amazon, Worldpac…" autocorrect="off">
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <label>Valor da Peça $</label>
+        <input type="number" id="pval-${idx}" placeholder="0.00" step="0.01" min="0"
+          oninput="calcTotal()" id="pval-${idx}">
+        <div class="sem-valor-row" style="margin-top:6px">
+          <input type="checkbox" id="semval-${idx}" onchange="toggleSemValor(${idx}, this.checked)">
+          <label for="semval-${idx}">Valor ainda não definido — precisa cotar</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Link da Peça</label>
+        <input type="url" id="plink-${idx}" placeholder="https://www.amazon.com/...">
+      </div>
+    </div>`;
+
+  document.getElementById('items-wrap').appendChild(d);
+  setTimeout(() => {
+    const el = document.getElementById('desc-' + idx);
+    if (el) el.focus();
+  }, 100);
+}
+
+function removeItem(idx) {
+  const el = document.getElementById('ic' + idx);
+  if (el) { el.remove(); calcTotal(); }
+}
+
+function togglePeca(idx, show) {
+  document.getElementById('pf-' + idx).classList.toggle('show', show);
+  calcTotal();
+}
+
+function toggleSemValor(idx, semValor) {
+  const valInput = document.getElementById('pval-' + idx);
+  if (valInput) {
+    valInput.disabled = semValor;
+    if (semValor) valInput.value = '';
+    calcTotal();
+  }
+}
+
+function calcTotal() {
+  let total = 0;
+  document.querySelectorAll('.icard').forEach(card => {
+    const id = card.id.replace('ic', '');
+    const labor = parseFloat(document.getElementById('labor-' + id)?.value) || 0;
+    const pval  = parseFloat(document.getElementById('pval-' + id)?.value)  || 0;
+    total += labor + pval;
+  });
+  document.getElementById('total-display').textContent = '$' + total.toFixed(2);
+}
+
+function getItems() {
+  const cards = document.querySelectorAll('.icard');
+  const items = []; let valid = true;
+  cards.forEach(c => {
+    const id   = c.id.replace('ic', '');
+    const desc = (document.getElementById('desc-' + id)?.value || '').trim();
+    if (!desc) { valid = false; return; }
+    const temPeca   = document.getElementById('togPeca-' + id)?.checked;
+    const semValor  = document.getElementById('semval-' + id)?.checked;
+    items.push({
+      desc,
+      labor:    parseFloat(document.getElementById('labor-' + id)?.value) || 0,
+      mechanic: (document.getElementById('mech-' + id)?.value || '').trim(),
+      peca: temPeca ? {
+        nome:      (document.getElementById('pnome-' + id)?.value || '').trim(),
+        numero:    (document.getElementById('pnum-' + id)?.value || '').trim(),
+        fornecedor:(document.getElementById('pforn-' + id)?.value || '').trim(),
+        valor:     semValor ? null : (parseFloat(document.getElementById('pval-' + id)?.value) || 0),
+        semValor:  semValor,
+        link:      (document.getElementById('plink-' + id)?.value || '').trim()
+      } : null
+    });
+  });
+  return valid ? items : null;
+}
+
+function submitForm() {
+  const vin      = document.getElementById('vin').value.trim().toUpperCase();
+  const ano      = document.getElementById('ano').value.trim();
+  const make     = document.getElementById('make').value.trim();
+  const model    = document.getElementById('model').value.trim();
+  const mileagem = document.getElementById('mileagem').value.trim();
+  const obs      = document.getElementById('obs').value.trim();
+
+  if (!vin || !ano || !make || !model) {
+    showErr('Por favor preencha: VIN, Ano, Make e Model.'); return;
+  }
+  const items = getItems();
+  if (!items || items.length === 0) {
+    showErr('Por favor adicione pelo menos um serviço.'); return;
+  }
+
+  document.getElementById('sub-btn').disabled = true;
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('err').style.display = 'none';
+
+  const payload = {
+    action: 'submitEstimateManutencao',
+    data: { vin, ano, make, model, mileagem, obs, items }
+  };
+
+  const url = APPS_SCRIPT_URL + '?estimateMan=' + encodeURIComponent(JSON.stringify(payload));
+  const img = new Image();
+  img.onload = img.onerror = () => {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('success-id').textContent =
+      ano + ' ' + make.toUpperCase() + ' ' + model.toUpperCase() + '\nVIN: ...' + vin.slice(-6);
+    document.getElementById('form-view').style.display = 'none';
+    document.getElementById('success-view').style.display = 'block';
+    window.scrollTo(0, 0);
+  };
+  img.src = url;
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetForm() {
+  document.querySelectorAll('input[type=text], input[type=number], input[type=url], textarea')
+    .forEach(el => { el.value = ''; el.disabled = false; });
+  document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+  document.querySelectorAll('.peca-fields').forEach(p => p.classList.remove('show'));
+  document.getElementById('items-wrap').innerHTML = '';
+  ic = 0; addItem();
+  document.getElementById('total-display').textContent = '$0.00';
+  document.getElementById('sub-btn').disabled = false;
+  document.getElementById('success-view').style.display = 'none';
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('err').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+// Init
+addItem();
+</script>
+</body>
+</html>
